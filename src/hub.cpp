@@ -3,26 +3,35 @@
 #include <asx/reactor.hpp>
 
 #include "hub.hpp"
-#include "conf_board.h"
 
 using namespace asx;
 using namespace asx::ioport;
+
+static constexpr auto IOPORT_TOOL_SETTER_AIR_BLAST = PinDef(A, 4);
+static constexpr auto IOPORT_CHUCK_CLAMP           = PinDef(A, 5);
+static constexpr auto IOPORT_SPINDLE_CLEAN         = PinDef(A, 6);
+static constexpr auto IOPORT_DOOR_PUSH             = PinDef(A, 7);
+static constexpr auto IOPORT_DOOR_PULL             = PinDef(B, 3);
+
+static constexpr auto IOPORT_PRESSURE_READOUT      = PinDef(B, 2);
+
+auto _init = Pin(IOPORT_PRESSURE_READOUT).init(dir_t::in, invert::inverted);
 
 namespace coil
 {
    struct Coil : public Pin
    {
       Coil(PinDef _pin) : Pin(_pin) {
-         init(dir_t::out);
+         init(dir_t::out, value_t::low);
       }
    };
 
    std::array<Coil, COUNT> coils = {
-       PinDef{IOPORT_TOOL_SETTER_AIR_BLAST},
-       PinDef{IOPORT_CHUCK_CLAMP},
-       PinDef{IOPORT_SPINDLE_CLEAN},
-       PinDef{IOPORT_DOOR_PUSH},
-       PinDef{IOPORT_DOOR_PULL}
+      IOPORT_TOOL_SETTER_AIR_BLAST,
+      IOPORT_CHUCK_CLAMP,
+      IOPORT_SPINDLE_CLEAN,
+      IOPORT_DOOR_PUSH,
+      IOPORT_DOOR_PULL
    };
 
    // Buffer for the next change
@@ -33,6 +42,7 @@ namespace coil
 
    void on_apply_change() {
       accept_change = true;
+
       if ( next >= 0 ) {
          for ( uint8_t i=0; i<coils.size(); ++i) {
             if ( next == i ) {
@@ -73,7 +83,7 @@ namespace coil
 
       if (accept_change) {
          coils[index].set(on);
-         
+
          accept_change = false; // Start a cool-off period
          react_on_apply_change.delay(250ms);
       } else {

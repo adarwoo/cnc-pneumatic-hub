@@ -5,11 +5,8 @@
  *
  * Created: 07/05/2024 17:08:37
  *  Author: micro
- */ 
+ */
 #include <stdbool.h>
-
-#include "digital_input.h"
-#include "op_codes.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,7 +14,7 @@ extern "C" {
 
 void pressure_mon_init(void);
 
-opcodes_reply_t pressure_mon_reply(void);
+opcodes_reply_t pressure_mon_get(void);
 
 #ifdef __cplusplus
 }

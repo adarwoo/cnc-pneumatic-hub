@@ -3,6 +3,7 @@
 
 using namespace asx;
 
+
 namespace hub
 {
    void on_read_coils(uint8_t addr, uint8_t qty)
@@ -13,31 +14,25 @@ namespace hub
       }
       else
       {
-         Datagram::pack((coil::get_all() >> addr) & (1 << qty));
+         uint8_t value = 0;
+
+         // Build the value by reading the LEDs
+         for (uint8_t i = 0; i < qty; ++i) {
+            value |= (coil::get(addr + i) ? 1 : 0) << i;
+         }
+
+         Datagram::set_size(2);          // Include the byte count itself in the size
+         Datagram::pack<uint8_t>(1);     // Byte count
+         Datagram::pack<uint8_t>(value); // Single value
       }
    }
 
-   void on_write_single(uint8_t index, uint16_t operation)
-   {
-      switch (operation)
-      {
-      case 0x0000:
-         coil::set(index, false);
-         break;
-      case 0xFF00:
-         coil::set(index);
-         break;
-      case 0x5500:
-         coil::set(index, !coil::get(index));
-         break;
-      default:
-         break;
-      }
+   void on_write_single_coil(uint8_t index, uint16_t operation) {
+      coil::set(index, operation == 0xff00);
    }
 
-   void on_write_coils(uint8_t from, uint8_t qty, uint8_t ignore, uint8_t values)
-   {
-      // Values should only have 1 bit set
+   void on_write_coils(uint8_t from, uint8_t qty, uint8_t ignore, uint8_t values) {
+      // Values should only have 1 bit set as we only allow 1 coil on at once
       if ( values && !(values & (values - 1)) ) {
          for (uint8_t i = 0; i < qty; ++i)
          {
@@ -60,7 +55,7 @@ namespace hub
       Datagram::set_size(6);
    }
 
-   void on_read_pressure()
+   void on_get_pressure()
    {
       Datagram::pack(coil::read_pressure());
    }
@@ -73,7 +68,7 @@ namespace hub
             return;
          }
       }
-      
+
       Datagram::pack(coil::read_pressure());
    }
 

@@ -3,7 +3,7 @@
  *
  * Created: 07/05/2024 16:50:47
  *  Author: micro
- */ 
+ */
 #include "digital_input.h"
 #include "conf_board.h"
 
@@ -26,8 +26,8 @@ void pressure_mon_init(void)
 }
 
 /** Get the port filtered value */
-opcodes_reply_t pressure_mon_reply(void)
+bool pressure_mon_get(void)
 {
-   return digital_input_value(_di) ? opcodes_reply_on : opcodes_reply_off;
+   return digital_input_value(_di);
 }
 
