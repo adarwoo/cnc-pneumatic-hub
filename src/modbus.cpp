@@ -31,23 +31,21 @@ namespace hub
       coil::set(index, operation == 0xff00);
    }
 
+   /// @brief Handler for the write coils modbus function
+   /// @param from 0 to 4 (modbus 1 to 5)
+   /// @param qty 1 to 4
+   /// @param ignore The number of bytes
+   /// @param values Binary form for the coils with the MSB matching the first coil
    void on_write_coils(uint8_t from, uint8_t qty, uint8_t ignore, uint8_t values) {
       // Values should only have 1 bit set as we only allow 1 coil on at once
-      if ( values && !(values & (values - 1)) ) {
-         for (uint8_t i = 0; i < qty; ++i)
-         {
-            if ( not coil::set(from + i, values & 1) ) {
-               Datagram::reply_error(modbus::error_t::negative_acknowledge);
-               return;
-            }
-
-            values >>= 1;
+      for (uint8_t i = 0; i < qty; ++i)
+      {
+         if ( not coil::set(from + i, values & 1) ) {
+            Datagram::reply_error(modbus::error_t::negative_acknowledge);
+            return;
          }
-      } else if ( values == 0 ) {
-         coil::release();
-      } else {
-         Datagram::reply_error(modbus::error_t::illegal_data_value);
-         return;
+
+         values >>= 1;
       }
 
       // For the response, we need to shorten the frame
@@ -55,8 +53,31 @@ namespace hub
       Datagram::set_size(6);
    }
 
+   void on_read_holding_registers(uint8_t from, uint8_t register_count) {
+      #include "conf_holding.inc"
+
+      uint8_t qty = register_count * 2;
+      uint8_t start = from * 2;
+
+      if ( start + qty > sizeof(holding_0) ) {
+         Datagram::reply_error(modbus::error_t::illegal_data_address);
+      } else {
+         Datagram::set_size(2); // Address + Code 03
+         Datagram::pack<uint8_t>(qty); // Byte count is 2x the register count
+
+         uint8_t i = 0;
+
+         for ( ; i < qty; ++i ) {
+            Datagram::pack<uint8_t>(holding_0[start + i]);
+         }
+
+         Datagram::set_size(3 + i);
+      }
+   }
+
    void on_get_pressure()
    {
+      Datagram::pack<uint8_t>(1); // Number of bytes
       Datagram::pack(coil::read_pressure());
    }
 

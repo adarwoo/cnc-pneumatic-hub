@@ -14,6 +14,7 @@ namespace hub {
     void on_write_coils(uint8_t addr, uint8_t qty, uint8_t, uint8_t data);
     void on_write_single_coil(uint8_t index, uint16_t value);
     void on_custom(uint8_t coils);
+    void on_read_holding_registers(uint8_t addr, uint8_t qty);
 
     // All states to consider
     enum class state_t : uint8_t {
@@ -39,6 +40,10 @@ namespace hub {
         DEVICE_49_WRITE_MULTIPLE_COILS_start_qty_bytecount,
         DEVICE_49_WRITE_MULTIPLE_COILS_start_qty_bytecount__ON_WRITE_COILS__CRC,
         RDY_TO_CALL__ON_WRITE_COILS,
+        DEVICE_49_READ_HOLDING_REGISTERS,
+        DEVICE_49_READ_HOLDING_REGISTERS_from,
+        DEVICE_49_READ_HOLDING_REGISTERS_from__ON_READ_HOLDING_REGISTERS__CRC,
+        RDY_TO_CALL__ON_READ_HOLDING_REGISTERS,
         DEVICE_49_CUSTOM,
         DEVICE_49_CUSTOM__ON_CUSTOM__CRC,
         RDY_TO_CALL__ON_CUSTOM
@@ -48,7 +53,7 @@ namespace hub {
         using error_t = asx::modbus::error_t;
 
         ///< Adjusted buffer to only receive the largest amount of data possible
-        inline static uint8_t buffer[32];
+        inline static uint8_t buffer[128];
         ///< Number of characters in the buffer
         inline static uint8_t cnt;
         ///< Number of characters to send
@@ -129,6 +134,8 @@ namespace hub {
                     state = state_t::DEVICE_49_WRITE_SINGLE_COIL;
                 } else if ( c == 15 ) {
                     state = state_t::DEVICE_49_WRITE_MULTIPLE_COILS;
+                } else if ( c == 3 ) {
+                    state = state_t::DEVICE_49_READ_HOLDING_REGISTERS;
                 } else if ( c == 101 ) {
                     state = state_t::DEVICE_49_CUSTOM;
                 } else {
@@ -263,6 +270,35 @@ namespace hub {
                     state = state_t::RDY_TO_CALL__ON_WRITE_COILS;
                 }
                 break;
+            case state_t::DEVICE_49_READ_HOLDING_REGISTERS:
+                if ( cnt == 4 ) {
+                    auto c = ntoh(cnt-2);
+
+                    if ( c <= 32 ) {
+                        state = state_t::DEVICE_49_READ_HOLDING_REGISTERS_from;
+                    } else {
+                        error = error_t::illegal_data_value;
+                        state = state_t::ERROR;
+                    }
+                }
+                break;
+            case state_t::DEVICE_49_READ_HOLDING_REGISTERS_from:
+                if ( cnt == 6 ) {
+                    auto c = ntoh(cnt-2);
+
+                    if ( c >= 1 and c <= 32 ) {
+                        state = state_t::DEVICE_49_READ_HOLDING_REGISTERS_from__ON_READ_HOLDING_REGISTERS__CRC;
+                    } else {
+                        error = error_t::illegal_data_value;
+                        state = state_t::ERROR;
+                    }
+                }
+                break;
+            case state_t::DEVICE_49_READ_HOLDING_REGISTERS_from__ON_READ_HOLDING_REGISTERS__CRC:
+                if ( cnt == 8 ) {
+                    state = state_t::RDY_TO_CALL__ON_READ_HOLDING_REGISTERS;
+                }
+                break;
             case state_t::DEVICE_49_CUSTOM:
                 state = state_t::DEVICE_49_CUSTOM__ON_CUSTOM__CRC;
                 break;
@@ -275,6 +311,7 @@ namespace hub {
             case state_t::RDY_TO_CALL__ON_READ_COILS:
             case state_t::RDY_TO_CALL__ON_WRITE_SINGLE_COIL:
             case state_t::RDY_TO_CALL__ON_WRITE_COILS:
+            case state_t::RDY_TO_CALL__ON_READ_HOLDING_REGISTERS:
             case state_t::RDY_TO_CALL__ON_CUSTOM:
             default:
                 error = error_t::illegal_data_value;
@@ -333,6 +370,9 @@ namespace hub {
             case state_t::DEVICE_49_WRITE_MULTIPLE_COILS_start_qty:
             case state_t::DEVICE_49_WRITE_MULTIPLE_COILS_start_qty_bytecount:
             case state_t::DEVICE_49_WRITE_MULTIPLE_COILS_start_qty_bytecount__ON_WRITE_COILS__CRC:
+            case state_t::DEVICE_49_READ_HOLDING_REGISTERS:
+            case state_t::DEVICE_49_READ_HOLDING_REGISTERS_from:
+            case state_t::DEVICE_49_READ_HOLDING_REGISTERS_from__ON_READ_HOLDING_REGISTERS__CRC:
             case state_t::DEVICE_49_CUSTOM:
             case state_t::DEVICE_49_CUSTOM__ON_CUSTOM__CRC:
                 error = error_t::illegal_data_value;
@@ -352,6 +392,9 @@ namespace hub {
                 break;
             case state_t::RDY_TO_CALL__ON_WRITE_COILS:
                 on_write_coils(buffer[3], buffer[5], buffer[6], buffer[7]);
+                break;
+            case state_t::RDY_TO_CALL__ON_READ_HOLDING_REGISTERS:
+                on_read_holding_registers(buffer[3], buffer[5]);
                 break;
             case state_t::RDY_TO_CALL__ON_CUSTOM:
                 on_custom(buffer[2]);

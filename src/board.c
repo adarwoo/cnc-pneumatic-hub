@@ -3,7 +3,7 @@
  *
  * Created: 07/05/2024 15:36:23
  *  Author: micro
- */ 
+ */
 /**
  * \file
  *
@@ -24,9 +24,6 @@
 
 void board_init(void)
 {
-   // Configure the clock
-   sysclk_init();
-   
    /* This function is meant to contain board-specific initialization code
     * for, e.g., the I/O pins. The initialization can rely on application-
     * specific board configuration, found in conf_board.h.
@@ -43,11 +40,11 @@ void board_init(void)
    // Force a zero on output the set as output
    ioport_set_pin_level(IOPORT_SPINDLE_CLEAN, false);
    ioport_set_pin_dir(IOPORT_SPINDLE_CLEAN, IOPORT_DIR_OUTPUT);
-    
+
    // Force a zero on output the set as output
    ioport_set_pin_level(IOPORT_DOOR_PUSH, false);
    ioport_set_pin_dir(IOPORT_DOOR_PUSH, IOPORT_DIR_OUTPUT);
-    
+
    // Force a zero on output the set as output
    ioport_set_pin_level(IOPORT_DOOR_PULL, false);
    ioport_set_pin_dir(IOPORT_DOOR_PULL, IOPORT_DIR_OUTPUT);
@@ -62,5 +59,5 @@ void board_init(void)
    ioport_set_pin_dir(TRACE_ERR, IOPORT_DIR_OUTPUT);
 
    // Allow the creation of digital inputs
-   digital_input_init();
+//   digital_input_init();
 }

@@ -10,7 +10,7 @@ SRCS = \
    src/main.cpp \
    src/modbus.cpp \
    src/hub.cpp \
-
+	src/board.c \
 
 # Inlude the actual build rules
 include asx/make/rules.mak
