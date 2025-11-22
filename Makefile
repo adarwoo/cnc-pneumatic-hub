@@ -3,14 +3,16 @@ ARCH:=attiny1627
 BIN:=cnc_pneumatic_hub
 INCLUDE_DIRS:=conf src
 
-ASX_USE:=modbus_rtu
+ASX_USE:=modbus_rtu eeprom
 
 # Project own files
 SRCS = \
    src/main.cpp \
    src/modbus.cpp \
-   src/hub.cpp \
+   src/net.cpp \
 	src/board.c \
+   src/config.cpp \
+   src/coils.cpp \
 
 # Inlude the actual build rules
 include asx/make/rules.mak

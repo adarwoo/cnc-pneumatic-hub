@@ -4,7 +4,7 @@
 #include "datagram.hpp"
 
 
-namespace hub {
+namespace net {
     /** Define the Usart to use by the rs485 */
     using UartConfig = asx::uart::CompileTimeConfig<
         115200,                       // Baudrate

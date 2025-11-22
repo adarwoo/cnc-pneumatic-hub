@@ -4,7 +4,7 @@
 using namespace asx;
 
 
-namespace hub
+namespace net
 {
    void on_read_coils(uint8_t addr, uint8_t qty)
    {
