@@ -66,11 +66,9 @@ namespace coil
 
          auto do_open  = [] (Coil *coil) { coil->set(false); };
          auto do_close = [] (Coil *coil) {
-            using namespace std::chrono;
-
             uint8_t index = coil->get_reactor_index();
 
-            react_on_update[index].delay(250ms, index);
+            react_on_update[index].delay(std::chrono::milliseconds(250), index);
             coil->set(true);
             coil->set_lock(true);
          };
