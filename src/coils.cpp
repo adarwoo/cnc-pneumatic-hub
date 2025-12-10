@@ -37,7 +37,7 @@ namespace coil
       uint8_t reactor_index;
 
    public:
-      Coil(ioport_pin_t _pin) : 
+      Coil(ioport_pin_t _pin) :
         pin(_pin),
         lock{false},
         reactor_index{next_avail_reactor++} {
@@ -121,11 +121,11 @@ namespace coil
    };
 
    std::array<ManagedCoil, COUNT> coils = {
-      IOPORT_TOOL_SETTER_AIR_BLAST,
-      IOPORT_CHUCK_CLAMP,
-      IOPORT_SPINDLE_CLEAN,
-      IOPORT_DOOR_PUSH,
-      IOPORT_DOOR_PULL
+      TOOL_SETTER_AIR_BLAST,
+      CHUCK_CLAMP,
+      SPINDLE_CLEAN,
+      DOOR_PUSH,
+      DOOR_PULL
    };
 
    void on_update_lock(uint8_t index) {
@@ -151,6 +151,6 @@ namespace coil
    }
 
    bool read_pressure() {
-      return ioport_get_pin_level(IOPORT_PRESSURE_READOUT);
+      return ioport_get_pin_level(PRESSURE_READOUT);
    }
 } // namespace coil

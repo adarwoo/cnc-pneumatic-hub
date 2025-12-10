@@ -9,9 +9,6 @@ ASX_USE:=modbus_rtu eeprom
 SRCS = \
    src/main.cpp \
    src/modbus.cpp \
-   src/net.cpp \
-	src/board.c \
-   src/config.cpp \
    src/coils.cpp \
 
 # Inlude the actual build rules
