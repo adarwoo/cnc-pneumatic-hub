@@ -56,7 +56,7 @@ namespace net {
 
       Datagram::pack<uint8_t>(1); // Number of bytes
 
-      auto status = pressure_readout.status();
+      auto status = pressure_mon::status();
       uint16_t retval = 0;
 
       for (uint8_t i=0; i<qty; ++i) {
@@ -74,6 +74,6 @@ namespace net {
          }
       }
 
-      Datagram::pack(get_pressure_status());
+      Datagram::pack(pressure_mon::value());
    }
 } // namespace net

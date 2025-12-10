@@ -1,17 +1,17 @@
 #include <array>
 #include <boost/sml.hpp>
 #include <ulog.h>
-#include <asx/reactor.hpp>
 
-#include "coils.hpp"
+#include <asx/reactor.hpp>
+#include <asx/ioport.hpp>
 
 #include "conf_board.h"
-#include <ioport.h>
-
+#include "coils.hpp"
 
 namespace coil
 {
    using namespace asx;
+   using namespace asx::ioport;
 
    struct open {};
    struct close {};
@@ -28,7 +28,7 @@ namespace coil
 
    class Coil {
    protected:
-      ioport_pin_t pin;
+      Pin pin;
 
       // Operation is not allowed
       bool lock;
@@ -37,7 +37,7 @@ namespace coil
       uint8_t reactor_index;
 
    public:
-      Coil(ioport_pin_t _pin) :
+      Coil(Pin _pin) :
         pin(_pin),
         lock{false},
         reactor_index{next_avail_reactor++} {
@@ -56,7 +56,7 @@ namespace coil
       }
 
       void set(bool level) {
-         ioport_set_pin_level(pin, level);
+         pin.set(level);
       }
    };
 
@@ -89,7 +89,7 @@ namespace coil
    {
       boost::sml::sm<PinStateMachineGenerator> sm;
    public:
-      ManagedCoil(ioport_pin_t _pin) : Coil(_pin), sm(static_cast<Coil*>(this)) {
+      ManagedCoil(Pin _pin) : Coil(_pin), sm(static_cast<Coil*>(this)) {
          react_on_update[reactor_index] = reactor::bind(on_update_lock);
       }
 
@@ -121,11 +121,11 @@ namespace coil
    };
 
    std::array<ManagedCoil, COUNT> coils = {
-      TOOL_SETTER_AIR_BLAST,
-      CHUCK_CLAMP,
-      SPINDLE_CLEAN,
-      DOOR_PUSH,
-      DOOR_PULL
+      ManagedCoil{TOOL_SETTER_AIR_BLAST},
+      ManagedCoil{CHUCK_CLAMP},
+      ManagedCoil{SPINDLE_CLEAN},
+      ManagedCoil{DOOR_PUSH},
+      ManagedCoil{DOOR_PULL}
    };
 
    void on_update_lock(uint8_t index) {
@@ -148,5 +148,14 @@ namespace coil
 
    bool set(uint8_t index, bool on) {
       return coils[index].open_close(on);
+   }
+
+   void init() {
+      // Force a zero on output the set as output
+      TOOL_SETTER_AIR_BLAST.init(dir_t::out, value_t::low);
+      CHUCK_CLAMP.init(dir_t::out, value_t::low);
+      SPINDLE_CLEAN.init(dir_t::out, value_t::low);
+      DOOR_PUSH.init(dir_t::out, value_t::low);
+      DOOR_PULL.init(dir_t::out, value_t::low);
    }
 } // namespace coil
