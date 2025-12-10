@@ -48,9 +48,22 @@ namespace net {
       Datagram::set_size(6);
    }
 
-   void on_get_pressure() {
+   void on_get_pressure(uint8_t addr, uint8_t qty) {
+      if (addr + qty > 2) {
+         Datagram::reply_error(modbus::error_t::illegal_data_value);
+         return;
+      }
+
       Datagram::pack<uint8_t>(1); // Number of bytes
-      Datagram::pack(get_pressure_status());
+
+      auto status = pressure_readout.status();
+      uint16_t retval = 0;
+
+      for (uint8_t i=0; i<qty; ++i) {
+         retval |= (status.get(addr + i) << i);
+      }
+
+      Datagram::pack(retval);
    }
 
    void on_custom(uint8_t coils) {

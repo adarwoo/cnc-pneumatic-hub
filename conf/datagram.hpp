@@ -10,7 +10,7 @@
 
 namespace net {
     // All callbacks registered
-    void on_get_pressure();
+    void on_get_pressure(uint8_t addr, uint8_t qty);
     void on_read_coils(uint8_t addr, uint8_t qty);
     void on_write_coils(uint8_t addr, uint8_t qty, uint8_t, uint8_t data);
     void on_write_single_coil(uint8_t index, uint16_t value);
@@ -173,7 +173,7 @@ namespace net {
                 if ( cnt == 4 ) {
                     auto c = ntoh(cnt-2);
 
-                    if ( c == 0 ) {
+                    if ( c <= 1 ) {
                         state = state_t::DEVICE_49_READ_DISCRETE_INPUTS_from;
                     } else {
                         error = error_t::illegal_data_value;
@@ -185,7 +185,7 @@ namespace net {
                 if ( cnt == 6 ) {
                     auto c = ntoh(cnt-2);
 
-                    if ( c == 1 ) {
+                    if ( c >= 1 and c <= 2 ) {
                         state = state_t::DEVICE_49_READ_DISCRETE_INPUTS_from__ON_GET_PRESSURE__CRC;
                     } else {
                         error = error_t::illegal_data_value;
@@ -436,7 +436,7 @@ namespace net {
                 cnt = 3;
                 break;
             case state_t::RDY_TO_CALL__ON_GET_PRESSURE:
-                on_get_pressure();
+                on_get_pressure(buffer[3], buffer[5]);
                 break;
             case state_t::RDY_TO_CALL__ON_READ_COILS:
                 on_read_coils(buffer[3], buffer[5]);

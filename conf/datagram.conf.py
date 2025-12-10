@@ -15,7 +15,7 @@ Modbus({
     },
 
     "callbacks": {
-        "on_get_pressure"          : [],
+        "on_get_pressure"          : [(u8, "addr"), (u8, "qty")],
         "on_read_coils"            : [(u8, "addr"), (u8, "qty")],
         "on_write_coils"           : [(u8, "addr"), (u8, "qty"), (u8), (u8, "data")],
         "on_write_single_coil"     : [(u8, "index"), (u16, "value")],
@@ -24,8 +24,8 @@ Modbus({
 
     f"device@49": [
         # Read the push button and switches state
-        (READ_DISCRETE_INPUTS,  u16(0, alias="from"),
-                                u16(1, alias="qty"), # Byte count
+        (READ_DISCRETE_INPUTS,  u16(0, 1, alias="from"),
+                                u16(1, 2, alias="qty"), # Byte count
                                 "on_get_pressure"),
 
         (READ_COILS,            u16(0, 11, alias="from"),
