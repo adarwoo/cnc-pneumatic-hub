@@ -149,8 +149,4 @@ namespace coil
    bool set(uint8_t index, bool on) {
       return coils[index].open_close(on);
    }
-
-   bool read_pressure() {
-      return ioport_get_pin_level(PRESSURE_READOUT);
-   }
 } // namespace coil

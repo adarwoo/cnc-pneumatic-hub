@@ -1,19 +1,15 @@
+#include "pressure_mon.hpp"
 #include "datagram.hpp"
 #include "coils.hpp"
 
 using namespace asx;
 
 
-namespace net
-{
-   void on_read_coils(uint8_t addr, uint8_t qty)
-   {
-      if (qty > (coil::COUNT - addr))
-      {
+namespace net {
+   void on_read_coils(uint8_t addr, uint8_t qty) {
+      if (qty > (coil::COUNT - addr)) {
          Datagram::reply_error(modbus::error_t::illegal_data_value);
-      }
-      else
-      {
+      } else{
          uint8_t value = 0;
 
          // Build the value by reading the LEDs
@@ -38,8 +34,7 @@ namespace net
    /// @param values Binary form for the coils with the MSB matching the first coil
    void on_write_coils(uint8_t from, uint8_t qty, uint8_t ignore, uint8_t values) {
       // Values should only have 1 bit set as we only allow 1 coil on at once
-      for (uint8_t i = 0; i < qty; ++i)
-      {
+      for (uint8_t i = 0; i < qty; ++i) {
          if ( not coil::set(from + i, values & 1) ) {
             Datagram::reply_error(modbus::error_t::negative_acknowledge);
             return;
@@ -53,36 +48,12 @@ namespace net
       Datagram::set_size(6);
    }
 
-   void on_read_holding_registers(uint8_t from, uint8_t register_count) {
-      #include "conf_holding.inc"
-
-      uint8_t qty = register_count * 2;
-      uint8_t start = from * 2;
-
-      if ( start + qty > sizeof(holding_0) ) {
-         Datagram::reply_error(modbus::error_t::illegal_data_address);
-      } else {
-         Datagram::set_size(2); // Address + Code 03
-         Datagram::pack<uint8_t>(qty); // Byte count is 2x the register count
-
-         uint8_t i = 0;
-
-         for ( ; i < qty; ++i ) {
-            Datagram::pack<uint8_t>(holding_0[start + i]);
-         }
-
-         Datagram::set_size(3 + i);
-      }
-   }
-
-   void on_get_pressure()
-   {
+   void on_get_pressure() {
       Datagram::pack<uint8_t>(1); // Number of bytes
-      Datagram::pack(coil::read_pressure());
+      Datagram::pack(get_pressure_status());
    }
 
-   void on_custom(uint8_t coils)
-   {
+   void on_custom(uint8_t coils) {
       for (uint8_t i=0; i<coil::COUNT; ++i) {
          if ( not coil::set(i, (coils >> i) & 1) ) {
             Datagram::reply_error(modbus::error_t::negative_acknowledge);
@@ -90,7 +61,6 @@ namespace net
          }
       }
 
-      Datagram::pack(coil::read_pressure());
+      Datagram::pack(get_pressure_status());
    }
-
-}
+} // namespace net

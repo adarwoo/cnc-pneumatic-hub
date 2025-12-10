@@ -31,4 +31,5 @@
 #define DOOR_PUSH             IOPORT(A, 7)
 #define DOOR_PULL             IOPORT(B, 3)
 
-#define PRESSURE_READOUT      IOPORT(B, 2)
+#define MAIN_PRESSURE_READOUT IOPORT(B, 1)
+#define MIN_PRESSURE_READOUT  IOPORT(B, 2)

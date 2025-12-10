@@ -3,7 +3,7 @@ ARCH:=attiny1627
 BIN:=cnc_pneumatic_hub
 INCLUDE_DIRS:=conf src
 
-ASX_USE:=modbus_rtu eeprom
+ASX_USE:=modbus_rtu reactor timer
 
 # Project own files
 SRCS = \
