@@ -9,8 +9,6 @@
 #include "pressure_mon.hpp"
 #include "coils.hpp"
 
-using namespace asx::ioport;
-
 int main(void)
 {
    // Initialise the Modbus slave system
