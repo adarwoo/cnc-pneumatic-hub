@@ -34,10 +34,7 @@ namespace pressure_mon {
 
       // Sample the pressure inputs every 10ms
       asx::reactor::bind([]{
-         uint8_t raw_inputs = (MIN_PRESSURE_READOUT.get() << 0) |
-                              (MAIN_PRESSURE_READOUT.get() << 1);
-
-         detail::pressure_readout.append(raw_inputs);
+         detail::pressure_readout.append(value());
       }).repeat(std::chrono::milliseconds(10));
    }
 }
