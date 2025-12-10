@@ -10,17 +10,15 @@
 /* Pin DEBUG_REACTOR_IDLE is available on the uPDI connector on Pin 3   */
 /* UART0 TxD is available on the uPDI connector on Pin 5                */
 /************************************************************************/
-#define TRACE_INFO           IOPORT(A, 1)
-#define TRACE_WARN           IOPORT(A, 2)
-#define TRACE_ERR            IOPORT(A, 3)
-#define DEBUG_REACTOR_IDLE   TRACE_INFO
-#define DEBUG_REACTOR_BUSY   TRACE_WARN
+#define TRACE_INFO           IOPORT(A, 2)
+#define TRACE_ERR            IOPORT(B, 0)
 
 /************************************************************************/
-/* Alert pin                                                            */
-/* This is connected to the LED_FAULT and shared for other purposes     */
+/* Wire debug pin for alert and reactor                                 */
 /************************************************************************/
-#define ALERT_OUTPUT_PIN            TRACE_ERR
+#undef DEBUG_REACTOR_IDLE
+#define DEBUG_REACTOR_BUSY    TRACE_INFO
+#define ALERT_OUTPUT_PIN      TRACE_ERR
 
 /************************************************************************/
 /* Pneumatic control pins                                               */
