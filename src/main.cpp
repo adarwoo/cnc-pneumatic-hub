@@ -4,13 +4,17 @@
  * @brief Main application entry point
  */
 #include <asx/reactor.hpp>
+#include <ulog.h>
 
 #include "modbus.hpp"
 #include "pressure_mon.hpp"
 #include "coils.hpp"
 
+
 int main(void)
 {
+   ULOG_MILE("System startup");
+
    // Initialise the Modbus slave system
    net::modbus_slave::init();
 

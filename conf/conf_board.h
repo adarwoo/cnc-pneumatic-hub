@@ -29,5 +29,5 @@
 #define DOOR_PUSH             IOPORT(A, 7)
 #define DOOR_PULL             IOPORT(B, 3)
 
-#define MAIN_PRESSURE_READOUT IOPORT(B, 1)
-#define MIN_PRESSURE_READOUT  IOPORT(B, 2)
+#define LOW_PRESSURE_ALARM    IOPORT(B, 0)
+#define WATER_PUMP_ALARM      IOPORT(B, 1)

@@ -55,15 +55,7 @@ namespace net {
       }
 
       Datagram::pack<uint8_t>(1); // Number of bytes
-
-      auto status = pressure_mon::status();
-      uint16_t retval = 0;
-
-      for (uint8_t i=0; i<qty; ++i) {
-         retval |= (status.get(addr + i) << i);
-      }
-
-      Datagram::pack(retval);
+      Datagram::pack<uint8_t>(pressure_mon::value());
    }
 
    void on_custom(uint8_t coils) {

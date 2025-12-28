@@ -1,9 +1,9 @@
 TOP:=.
-ARCH:=attiny1627
+ARCH:=attiny3224
 BIN:=cnc_pneumatic_hub
 INCLUDE_DIRS:=conf src
 
-ASX_USE:=modbus_rtu reactor timer
+ASX_USE:=modbus_rtu reactor timer ulog
 
 # Project own files
 SRCS = \

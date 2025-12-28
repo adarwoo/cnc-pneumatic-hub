@@ -5,6 +5,7 @@ Modbus({
     "namespace": "net",
     "slave": True,
     "buffer_size": 80, # Max reg read = 0x20 (32 x 2) + Frame (ID+CODE+NUM+CRC)
+    "slave_id": 49, # Reported slave ID over code 0x11 (Report Slave ID)
 
     "identification": {
         VENDOR_NAME:            "ARex",
